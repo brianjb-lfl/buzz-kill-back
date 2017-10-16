@@ -2,6 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
+const { Patron } = require('./models');
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
@@ -43,9 +44,36 @@ const testData = [
   }
 ];
 
-router.get('/patrons/', (req,res) => {
+router.get('/patrons/test/', (req,res) => {
   console.log('running router.js');
   res.json(testData);
+});
+
+router.get('/patrons/', (req, res) => {
+  Patron
+    .find()
+    .then( patrons => {
+      res.json(patrons);
+    })
+    .catch( err => {
+      console.error(err);
+      res.status(500).json({error: 'Search failed'});
+    });
+});
+
+router.post('/patrons/', jsonParser, (req, res) => {
+  Patron
+    .create({
+      table: req.body.table,
+      seat: req.body.seat,
+      gender: req.body.gender
+    })
+    .then(
+      patron => res.status(201).json(patron.apiRepr())
+    )
+    .catch( err => {
+      res.status(500).json({message: 'Internal server error'});
+    });
 });
 
 module.exports = { router };
