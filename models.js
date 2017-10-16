@@ -13,9 +13,18 @@ const PatronSchema = mongoose.Schema({
     type: Number,
     required: true
   },
+  weight: {
+    type: Number,
+    required: true,
+    default: 175
+  },
   gender: {
     type: String,
     required: true
+  },
+  start: {
+    type: Date,
+    default: Date.now    
   }
 });
 
@@ -24,7 +33,9 @@ PatronSchema.methods.apiRepr = function () {
     id: this._id,
     table: this.table,
     seat: this.seat,
-    gener: this.gender
+    weight: this.weight,
+    gender: this.gender,
+    start: this.start
   };
 };
 
