@@ -24,6 +24,10 @@ app.use(
 
 app.use('/api/', router);
 
+app.use('*', (req, res) => {
+  return res.status(404).json({message: 'Not Found'});
+});
+
 function runServer(port = PORT) {
   const server = app
     .listen(port, () => {

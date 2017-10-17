@@ -45,7 +45,7 @@ PatronSchema.virtual('bac')
     let bacCalc = 0;
     const genderF = this.gender === 'm' ? .73 : .66;
     this.drinks.forEach( drink => {
-      const elapsedT = (moment(moment().diff(this.start)).format('m'))/60;
+      const elapsedT = (moment(moment().diff(drink.drinkTime)).format('m'))/60;
       bacCalc += ((drink.drinkEq * .6 * 5.14) / (this.weight * genderF)) - (.015 * elapsedT);
     });
     return (bacCalc * 100).toFixed(1);

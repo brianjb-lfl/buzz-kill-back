@@ -20,6 +20,17 @@ router.get('/patrons/', (req, res) => {
 });
 
 router.post('/patrons/', jsonParser, (req, res) => {
+  const requiredFs = ['table', 'seat', 'gender'];
+  const missingF = requiredFs.find( field => !(field in req.body));
+  if ( missingF) {
+    return res.status(422).json({
+      code: 422,
+      reason: 'validationError',
+      message: 'Missing field',
+      location: missingF
+    });
+  }
+  
   Patron
     .create({
       table: req.body.table,
@@ -56,6 +67,7 @@ router.put('/drinks/:id', jsonParser, (req, res) => {
 });
 
 router.delete('/patrons/:id', (req, res) => {
+
   Patron
     .findByIdAndRemove(req.params.id)
     .then( () => {
