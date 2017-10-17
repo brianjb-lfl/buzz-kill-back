@@ -25,7 +25,7 @@ const PatronSchema = mongoose.Schema({
   },
   start: {
     type: Date,
-    default: moment()    
+    default: Date.now    
   },
   drinks: [{
     drinkEq: {
@@ -35,7 +35,7 @@ const PatronSchema = mongoose.Schema({
     },
     drinkTime: {
       type: Date,
-      default: moment()
+      default: Date.now
     }
   }]
 });
@@ -45,25 +45,25 @@ PatronSchema.virtual('bac')
     let bacCalc = 0;
     const genderF = this.gender === 'm' ? .73 : .66;
     this.drinks.forEach( drink => {
-      const elapsedT = (moment(moment().diff(drink.drinkTime)).format('m'))/60;
-      bacCalc += ((drink.drinkEq * .6 * 5.14) / (this.weight * genderF)) - (.015 * elapsedT);
+      const elapsedT = moment.utc(moment()).diff(moment.utc(drink.drinkTime))/3600000;
+      bacCalc += Math.max(((drink.drinkEq * .6 * 5.14) / (this.weight * genderF)) - (.015 * elapsedT), 0);
     });
     return (bacCalc * 100).toFixed(1);
   });
 
 PatronSchema.virtual('timeOnSite')
   .get(function() {
-    if(this.drinks.length < 1){
-      return "0:00";
+    let elapsedTime = Math.round(moment.utc(moment()).diff(moment.utc(this.start))/60000);
+    let timeOutput = Math.floor(elapsedTime / 60);
+    elapsedTime -= (timeOutput * 60);
+    if(elapsedTime < 10) {
+      timeOutput += ":0" + elapsedTime;
     }
     else {
-      console.log(moment());
-      let minElapsed =  moment(moment().diff(this.start)).format('m');
-      // const hrsElapsed = Math.floor(minElapsed/60);
-      // minElapsed = minElapsed - (hrsElapsed * 60);
-      // minElapsed = minElapsed < 10 ? "0" + minElapsed : minElapsed;
-      return minElapsed;
+      timeOutput += ":" + elapsedTime;
     }
+    
+    return timeOutput;
   });
 
 PatronSchema.methods.apiRepr = function () {
