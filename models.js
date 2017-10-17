@@ -57,11 +57,12 @@ PatronSchema.virtual('timeOnSite')
       return "0:00";
     }
     else {
+      console.log(moment());
       let minElapsed =  moment(moment().diff(this.start)).format('m');
-      const hrsElapsed = Math.floor(minElapsed/60);
-      minElapsed = minElapsed - (hrsElapsed * 60);
-      minElapsed = minElapsed < 10 ? "0" + minElapsed : minElapsed;
-      return hrsElapsed + ":" + minElapsed;
+      // const hrsElapsed = Math.floor(minElapsed/60);
+      // minElapsed = minElapsed - (hrsElapsed * 60);
+      // minElapsed = minElapsed < 10 ? "0" + minElapsed : minElapsed;
+      return minElapsed;
     }
   });
 
