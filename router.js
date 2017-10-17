@@ -53,7 +53,8 @@ router.get('/patrons/', (req, res) => {
   Patron
     .find()
     .then( patrons => {
-      res.json(patrons);
+      let newArr = patrons.map( patron => patron.apiRepr());
+      res.json(newArr);
     })
     .catch( err => {
       console.error(err);

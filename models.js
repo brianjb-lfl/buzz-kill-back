@@ -1,6 +1,7 @@
 'use strict';
 
 const mongoose = require('mongoose');
+const moment = require('moment');
 
 mongoose.Promise = global.Promise;
 
@@ -24,7 +25,7 @@ const PatronSchema = mongoose.Schema({
   },
   start: {
     type: Date,
-    default: Date.now    
+    default: moment()    
   },
   drinks: [{
     drinkEq: {
@@ -34,10 +35,40 @@ const PatronSchema = mongoose.Schema({
     },
     drinkTime: {
       type: Date,
-      default: Date.now
+      default: moment()
     }
   }]
 });
+
+PatronSchema.virtual('bac')
+  .get(function() {
+    let bacCalc = 0;
+    const genderF = this.gender === 'm' ? .73 : .66;
+    this.drinks.forEach( drink => {
+      const elapsedT = (moment(moment().diff(this.start)).format('m'))/60;
+      bacCalc += ((drink.drinkEq * .6 * 5.14) / (this.weight * genderF)) - (.015 * elapsedT);
+    });
+    return (bacCalc * 100).toFixed(1);
+  });
+
+PatronSchema.virtual('timeOnSite')
+  .get(function() {
+    if(this.drinks.length < 1){
+      return "0:00";
+    }
+    else {
+      let minElapsed =  moment(moment().diff(this.start)).format('m');
+      const hrsElapsed = Math.floor(minElapsed/60);
+      minElapsed = minElapsed - (hrsElapsed * 60);
+      minElapsed = minElapsed < 10 ? "0" + minElapsed : minElapsed;
+      return hrsElapsed + ":" + minElapsed;
+    }
+  });
+
+PatronSchema.virtual('myField')
+  .get(function() {
+    return 'test';
+  });
 
 PatronSchema.methods.apiRepr = function () {
   return {
@@ -47,7 +78,10 @@ PatronSchema.methods.apiRepr = function () {
     weight: this.weight,
     gender: this.gender,
     start: this.start,
-    drinks: this.drinks
+    drinks: this.drinks,
+    myField: this.myField,
+    bac: this.bac,
+    timeOnSite: this.timeOnSite
   };
 };
 
