@@ -65,11 +65,6 @@ PatronSchema.virtual('timeOnSite')
     }
   });
 
-PatronSchema.virtual('myField')
-  .get(function() {
-    return 'test';
-  });
-
 PatronSchema.methods.apiRepr = function () {
   return {
     id: this._id,
@@ -79,7 +74,6 @@ PatronSchema.methods.apiRepr = function () {
     gender: this.gender,
     start: this.start,
     drinks: this.drinks,
-    myField: this.myField,
     bac: this.bac,
     timeOnSite: this.timeOnSite
   };
