@@ -25,7 +25,18 @@ const PatronSchema = mongoose.Schema({
   start: {
     type: Date,
     default: Date.now    
-  }
+  },
+  drinks: [{
+    drinkEq: {
+      type: Number,
+      required: true,
+      default: 1.0
+    },
+    drinkTime: {
+      type: Date,
+      default: Date.now
+    }
+  }]
 });
 
 PatronSchema.methods.apiRepr = function () {
@@ -35,7 +46,8 @@ PatronSchema.methods.apiRepr = function () {
     seat: this.seat,
     weight: this.weight,
     gender: this.gender,
-    start: this.start
+    start: this.start,
+    drinks: this.drinks
   };
 };
 

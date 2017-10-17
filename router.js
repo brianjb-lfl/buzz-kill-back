@@ -66,13 +66,42 @@ router.post('/patrons/', jsonParser, (req, res) => {
     .create({
       table: req.body.table,
       seat: req.body.seat,
-      gender: req.body.gender
+      weight: req.body.weight,
+      gender: req.body.gender,
+      drinks: req.body.drinks
     })
     .then(
       patron => res.status(201).json(patron.apiRepr())
     )
     .catch( err => {
       res.status(500).json({message: 'Internal server error'});
+    });
+});
+
+router.put('/drinks/:id', jsonParser, (req, res) => {
+  if(!(req.params.id && req.body._id && req.params.id === req.body._id)) {
+    res.status(400).json({
+      error: 'Request path id and request body id values must match'
+    });
+  }
+  Patron
+    .findByIdAndUpdate(
+      req.params.id,
+      {"$push": { "drinks": req.body.drinks }}, {"new":true}
+    )
+    .then(
+      patron => res.status(201).json(patron.apiRepr())
+    )
+    .catch( err => {
+      res.status(500).json({message: 'Internal server error'});
+    });
+});
+
+router.delete('/patrons/:id', (req, res) => {
+  Patron
+    .findByIdAndRemove(req.params.id)
+    .then( () => {
+      res.status(204).end();
     });
 });
 
