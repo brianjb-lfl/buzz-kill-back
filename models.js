@@ -66,11 +66,17 @@ PatronSchema.virtual('timeOnSite')
     return timeOutput;
   });
 
+PatronSchema.virtual('seatString')
+  .get(function() {
+    return `Table ${this.table} - Seat ${this.seat}`;
+  });
+
 PatronSchema.methods.apiRepr = function () {
   return {
     id: this._id,
     table: this.table,
     seat: this.seat,
+    seatString: this.seatString,
     weight: this.weight,
     gender: this.gender,
     start: this.start,

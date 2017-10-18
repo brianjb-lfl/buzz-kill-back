@@ -9,6 +9,7 @@ const jsonParser = bodyParser.json();
 router.get('/patrons/', (req, res) => {
   Patron
     .find()
+    .sort('start')
     .then( patrons => {
       let newArr = patrons.map( patron => patron.apiRepr());
       res.json(newArr);
