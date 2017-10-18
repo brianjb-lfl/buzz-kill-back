@@ -22,7 +22,7 @@ router.get('/patrons/', (req, res) => {
 router.post('/patrons/', jsonParser, (req, res) => {
   const requiredFs = ['table', 'seat', 'gender'];
   const missingF = requiredFs.find( field => !(field in req.body));
-  if ( missingF) {
+  if (missingF) {
     return res.status(422).json({
       code: 422,
       reason: 'validationError',
@@ -31,18 +31,29 @@ router.post('/patrons/', jsonParser, (req, res) => {
     });
   }
   
-  Patron
-    .create({
-      table: req.body.table,
-      seat: req.body.seat,
-      weight: req.body.weight,
-      gender: req.body.gender,
-      drinks: []
+  let {table, seat, gender} = req.body;
+  let drinks = [];
+
+  return Patron.find({table, seat})
+    .count()
+    .then( count => {
+      if(count > 0){
+        return Promise.reject({
+          code: 422,
+          reason: 'ValidationError',
+          message: 'That table/seat is already occupied'
+        });
+      }
     })
-    .then(
-      patron => res.status(201).json(patron.apiRepr())
+    .then( () => {
+      return   Patron.create({table, seat, gender, drinks});
+    })
+    .then(patron => res.status(201).json(patron.apiRepr())
     )
     .catch( err => {
+      if (err.reason === 'ValidationError') {
+        return res.status(err.code).json(err);
+      }
       res.status(500).json({message: 'Internal server error'});
     });
 });
@@ -70,6 +81,18 @@ router.delete('/patrons/:id', (req, res) => {
 
   Patron
     .findByIdAndRemove(req.params.id)
+    .then( () => {
+      res.status(204).end();
+    })
+    .catch( err => {
+      res.status(500).json({message: 'Internal server error'});
+    });
+});
+
+router.delete('/patrons/dayclose/', (req, res) => {
+  
+  Patron
+    .remove({})
     .then( () => {
       res.status(204).end();
     });
