@@ -77,6 +77,15 @@ router.put('/drinks/:id', jsonParser, (req, res) => {
     });
 });
 
+router.delete('/patrons/dayclose/', (req, res) => {
+  
+  return Patron
+    .remove({})
+    .then( () => {
+      res.status(204).end();
+    });
+});
+
 router.delete('/patrons/:id', (req, res) => {
 
   Patron
@@ -86,15 +95,6 @@ router.delete('/patrons/:id', (req, res) => {
     })
     .catch( err => {
       res.status(500).json({message: 'Internal server error'});
-    });
-});
-
-router.delete('/patrons/dayclose/', (req, res) => {
-  
-  Patron
-    .remove({})
-    .then( () => {
-      res.status(204).end();
     });
 });
 
