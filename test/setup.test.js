@@ -56,7 +56,7 @@ describe('api/patrons GET', function() {
         expect(res).to.be.json;
         res.body.forEach(function(patron) {
           expect(patron).to.be.an('object');
-          expect(patron).to.include.keys('table', 'seat', 'gender', 'weight', 'drinks');
+          expect(patron).to.include.keys('seatString', 'start', 'bac', 'timeOnSite', 'drinks');
         });
       })
       .catch(err => {
@@ -65,4 +65,39 @@ describe('api/patrons GET', function() {
         }
       });
   });
+});
+
+describe('api/patrons POST', function() {
+  it('should return all existing patrons', function() {
+    return chai
+      .request(app)
+      .get('/api/patrons/')
+      .then(function (res) {
+        expect(res).to.have.status(200);
+        expect(res.body.length).to.be.above(0);
+        expect(res.body).to.be.an('array');
+        expect(res).to.be.json;
+        res.body.forEach(function(patron) {
+          expect(patron).to.be.an('object');
+          expect(patron).to.include.keys('seatString', 'start', 'bac', 'timeOnSite', 'drinks');
+        });
+      })
+      .catch(err => {
+        if(err instanceof chai.AssertionError) {
+          throw err;
+        }
+      });
+  });
+});
+
+describe('api/drinks/:id PUT', function() {
+  // drinks PUT tests
+});
+
+describe('api/patrons/dayclose DELETE', function() {
+  // drinks PUT tests
+});
+
+describe('api/patrons/:id DELETE', function() {
+  // drinks PUT tests
 });

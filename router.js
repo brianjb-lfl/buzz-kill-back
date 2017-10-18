@@ -21,6 +21,7 @@ router.get('/patrons/', (req, res) => {
 });
 
 router.post('/patrons/', jsonParser, (req, res) => {
+  
   const requiredFs = ['table', 'seat', 'gender'];
   const missingF = requiredFs.find( field => !(field in req.body));
   if (missingF) {
@@ -29,6 +30,15 @@ router.post('/patrons/', jsonParser, (req, res) => {
       reason: 'validationError',
       message: 'Missing field',
       location: missingF
+    });
+  }
+  
+  const nanF = (isNaN(req.body.table) || isNaN(req.body.seat));
+  if (nanF) {
+    return res.status(422).json({
+      code: 422,
+      reason: 'validationError',
+      message: 'Table and seat must be numbers'
     });
   }
   
