@@ -22,7 +22,7 @@ chai.use(chaiHttp);
 describe('/api', function () {
   const table = 13;
   const seat = 13;
-  const gender = 'm';
+  const gender = "m";
   const drink = {drinkEq: 1.0};
 
   before(function() {
@@ -144,12 +144,27 @@ describe('/api', function () {
           const res = err.response;
           expect(res).to.have.status(422);
           expect(res.body.reason).to.equal('validationError');
-          expect(res.body.message).to.equal('Missing field');
-          expect(res.body.location).to.equal('gender');
+          expect(res.body.message).to.equal('Table and seat must be numbers');
         });
     });
 
-    // need test of non-number seat entry
+    it('should reject posts with non-number seat entry', function() {
+      return chai
+        .request(app)
+        .post('/api/patrons/')
+        .send({table, seat: '', gender})
+        .then(function () {
+          expect.fail(null, null, 'Request should fail');})
+        .catch(err => {
+          if(err instanceof chai.AssertionError) {
+            throw err;
+          }
+          const res = err.response;
+          expect(res).to.have.status(422);
+          expect(res.body.reason).to.equal('validationError');
+          expect(res.body.message).to.equal('Table and seat must be numbers');
+        });
+    });
 
     it('should reject patrons in a seat already occupied', function() {
       // create a patron with known table, seat
@@ -172,8 +187,6 @@ describe('/api', function () {
           expect(res.body.message).to.equal('That table/seat is already occupied');
         });
     });
-
-
 
   });
 

@@ -100,7 +100,13 @@ router.delete('/patrons/dayclose/', (req, res) => {
 router.delete('/patrons/:id', (req, res) => {
 
   Patron
-    .findByIdAndRemove(req.params.id)
+    .find(req.params.id)
+    .then( patron => {
+      if(!patron) {
+        res.status(422).json({message: 'User not found'});
+      }
+      return Patron.findByIdAndRemove(req.params.id);
+    })
     .then( () => {
       res.status(204).end();
     })
