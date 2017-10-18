@@ -149,6 +149,30 @@ describe('/api', function () {
         });
     });
 
+    // need test of non-number seat entry
+
+    it('should reject patrons in a seat already occupied', function() {
+      // create a patron with known table, seat
+      return Patron.create({table, seat, gender})
+        .then( () =>
+          chai.request(app)
+            .post('/api/patrons/')
+            .send({table, seat, gender})
+        )
+        .then( () => 
+          expect.fail(null, null, 'Request should fail')
+        )
+        .catch(err => {
+          if(err instanceof chai.AssertionError) {
+            throw err;
+          }
+          const res = err.response;
+          expect(res).to.have.status(422);
+          expect(res.body.reason).to.equal('validationError');
+          expect(res.body.message).to.equal('That table/seat is already occupied');
+        });
+    });
+
 
 
   });
