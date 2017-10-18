@@ -51,7 +51,7 @@ router.post('/patrons/', jsonParser, (req, res) => {
       if(count > 0){
         return Promise.reject({
           code: 422,
-          reason: 'ValidationError',
+          reason: 'validationError',
           message: 'That table/seat is already occupied'
         });
       }
@@ -62,7 +62,7 @@ router.post('/patrons/', jsonParser, (req, res) => {
     .then(patron => res.status(201).json(patron.apiRepr())
     )
     .catch( err => {
-      if (err.reason === 'ValidationError') {
+      if (err.reason === 'validationError') {
         return res.status(err.code).json(err);
       }
       res.status(500).json({message: 'Internal server error'});

@@ -19,85 +19,150 @@ process.stdout.write('\x1Bc\n');
 const expect = chai.expect;
 chai.use(chaiHttp);
 
-before(function() {
-  console.log(TEST_DATABASE_URL);
-  return dbConnect(TEST_DATABASE_URL);
-});
+describe('/api', function () {
+  const table = 13;
+  const seat = 13;
+  const gender = 'm';
+  const drink = {drinkEq: 1.0};
 
-after(function() {
-  return dbDisconnect();
-});
-
-beforeEach(function(){
-  return Patron.create({
-    table: 1,
-    seat: 1,
-    gender: "m",
-    weight: 175,
-    drinks: [{
-      drinkEq: 1.5
-    }]
+  before(function() {
+    console.log(TEST_DATABASE_URL);
+    return dbConnect(TEST_DATABASE_URL);
   });
-});
 
-afterEach(function(){
-  return Patron.remove({});
-});
+  after(function() {
+    return dbDisconnect();
+  });
 
-describe('api/patrons GET', function() {
-  it('should return all existing patrons', function() {
-    return chai
-      .request(app)
-      .get('/api/patrons/')
-      .then(function (res) {
-        expect(res).to.have.status(200);
-        expect(res.body.length).to.be.above(0);
-        expect(res.body).to.be.an('array');
-        expect(res).to.be.json;
-        res.body.forEach(function(patron) {
-          expect(patron).to.be.an('object');
-          expect(patron).to.include.keys('seatString', 'start', 'bac', 'timeOnSite', 'drinks');
+  beforeEach(function(){
+    return Patron.create({
+      table: 1,
+      seat: 1,
+      gender: "m",
+      drinks: [{
+        drinkEq: 1.5
+      }]
+    });
+  });
+
+  afterEach(function(){
+    return Patron.remove({});
+  });
+
+  describe('api/patrons GET', function() {
+    it('should return all existing patrons', function() {
+      return chai
+        .request(app)
+        .get('/api/patrons/')
+        .then(function (res) {
+          expect(res).to.have.status(200);
+          expect(res.body.length).to.be.above(0);
+          expect(res.body).to.be.an('array');
+          expect(res).to.be.json;
+          res.body.forEach(function(patron) {
+            expect(patron).to.be.an('object');
+            expect(patron).to.include.keys('seatString', 'start', 'bac', 'timeOnSite', 'drinks');
+          });
+        })
+        .catch(err => {
+          if(err instanceof chai.AssertionError) {
+            throw err;
+          }
         });
-      })
-      .catch(err => {
-        if(err instanceof chai.AssertionError) {
-          throw err;
-        }
-      });
+    });
   });
-});
 
-describe('api/patrons POST', function() {
-  it('should return all existing patrons', function() {
-    return chai
-      .request(app)
-      .get('/api/patrons/')
-      .then(function (res) {
-        expect(res).to.have.status(200);
-        expect(res.body.length).to.be.above(0);
-        expect(res.body).to.be.an('array');
-        expect(res).to.be.json;
-        res.body.forEach(function(patron) {
-          expect(patron).to.be.an('object');
-          expect(patron).to.include.keys('seatString', 'start', 'bac', 'timeOnSite', 'drinks');
+  describe('api/patrons POST', function() {
+    it('should reject posts with missing table', function() {
+      return chai
+        .request(app)
+        .post('/api/patrons/')
+        .send({seat, gender})
+        .then(function () {
+          expect.fail(null, null, 'Request should fail');})
+        .catch(err => {
+          if(err instanceof chai.AssertionError) {
+            throw err;
+          }
+          const res = err.response;
+          expect(res).to.have.status(422);
+          expect(res.body.reason).to.equal('validationError');
+          expect(res.body.message).to.equal('Missing field');
+          expect(res.body.location).to.equal('table');
         });
-      })
-      .catch(err => {
-        if(err instanceof chai.AssertionError) {
-          throw err;
-        }
-      });
+    });
+
+    it('should reject posts with missing seat', function() {
+      return chai
+        .request(app)
+        .post('/api/patrons/')
+        .send({table, gender})
+        .then(function () {
+          expect.fail(null, null, 'Request should fail');})
+        .catch(err => {
+          if(err instanceof chai.AssertionError) {
+            throw err;
+          }
+          const res = err.response;
+          expect(res).to.have.status(422);
+          expect(res.body.reason).to.equal('validationError');
+          expect(res.body.message).to.equal('Missing field');
+          expect(res.body.location).to.equal('seat');
+        });
+    });
+
+    it('should reject posts with missing gender', function() {
+      return chai
+        .request(app)
+        .post('/api/patrons/')
+        .send({table, seat})
+        .then(function () {
+          expect.fail(null, null, 'Request should fail');})
+        .catch(err => {
+          if(err instanceof chai.AssertionError) {
+            throw err;
+          }
+          const res = err.response;
+          expect(res).to.have.status(422);
+          expect(res.body.reason).to.equal('validationError');
+          expect(res.body.message).to.equal('Missing field');
+          expect(res.body.location).to.equal('gender');
+        });
+    });
+
+    it('should reject posts with non-number table entry', function() {
+      return chai
+        .request(app)
+        .post('/api/patrons/')
+        .send({table: "a", seat, gender})
+        .then(function () {
+          expect.fail(null, null, 'Request should fail');})
+        .catch(err => {
+          if(err instanceof chai.AssertionError) {
+            throw err;
+          }
+          const res = err.response;
+          expect(res).to.have.status(422);
+          expect(res.body.reason).to.equal('validationError');
+          expect(res.body.message).to.equal('Missing field');
+          expect(res.body.location).to.equal('gender');
+        });
+    });
+
+
+
   });
-});
 
-describe('api/drinks/:id PUT', function() {
-  // drinks PUT tests
-});
+  describe('api/drinks/:id PUT', function() {
+    // drinks PUT tests
+  });
 
-describe('api/patrons/dayclose DELETE', function() {
-  // drinks PUT tests
-});
+  describe('api/patrons/dayclose DELETE', function() {
+    // drinks PUT tests
+  });
 
-describe('api/patrons/:id DELETE', function() {
-  // drinks PUT tests
+  describe('api/patrons/:id DELETE', function() {
+    // drinks PUT tests
+  });
+
 });
