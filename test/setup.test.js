@@ -5,6 +5,7 @@ const {dbConnect, dbDisconnect} = require('../db-mongoose');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 
+const { app } = require('../index');
 const {Patron} = require('../models');
 
 
@@ -19,6 +20,7 @@ const expect = chai.expect;
 chai.use(chaiHttp);
 
 before(function() {
+  console.log(TEST_DATABASE_URL);
   return dbConnect(TEST_DATABASE_URL);
 });
 
@@ -36,15 +38,31 @@ beforeEach(function(){
       drinkEq: 1.5
     }]
   });
-
 });
 
 afterEach(function(){
-  return Patron.remove({})
+  return Patron.remove({});
 });
 
-describe('Mocha and Chai', function() {
-  it('should be properly setup', function() {
-    expect(true).to.be.true;
+describe('api/patrons GET', function() {
+  it('should return all existing patrons', function() {
+    return chai
+      .request(app)
+      .get('/api/patrons/')
+      .then(function (res) {
+        expect(res).to.have.status(200);
+        expect(res.body.length).to.be.above(0);
+        expect(res.body).to.be.an('array');
+        expect(res).to.be.json;
+        res.body.forEach(function(patron) {
+          expect(patron).to.be.an('object');
+          expect(patron).to.include.keys('table', 'seat', 'gender', 'weight', 'drinks');
+        });
+      })
+      .catch(err => {
+        if(err instanceof chai.AssertionError) {
+          throw err;
+        }
+      });
   });
 });
