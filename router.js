@@ -33,8 +33,8 @@ router.post('/patrons/', jsonParser, (req, res) => {
     });
   }
   
-  const nanF = (isNaN(req.body.table) || isNaN(req.body.seat));
-  if (nanF) {
+  const validTblSeatFs = !(req.body.table > 0) || !(req.body.seat>0);
+  if (validTblSeatFs) {
     return res.status(422).json({
       code: 422,
       reason: 'validationError',
