@@ -75,7 +75,7 @@ router.put('/drinks/:id', jsonParser, (req, res) => {
       error: 'Request path id and request body id values must match'
     });
   }
-  Patron
+  return Patron
     .findByIdAndUpdate(
       req.params.id,
       {"$push": { "drinks": req.body.drinks }}, {"new":true}
