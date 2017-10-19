@@ -71,11 +71,11 @@ router.post('/patrons/', jsonParser, (req, res) => {
 
 router.put('/drinks/:id', jsonParser, (req, res) => {
   if(!(req.params.id && req.body._id && req.params.id === req.body._id)) {
-    res.status(400).json({
+    return res.status(400).json({
       error: 'Request path id and request body id values must match'
     });
   }
-  return Patron
+  Patron
     .findByIdAndUpdate(
       req.params.id,
       {"$push": { "drinks": req.body.drinks }}, {"new":true}

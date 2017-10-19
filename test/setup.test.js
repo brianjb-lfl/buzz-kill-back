@@ -199,6 +199,7 @@ describe('/api', function () {
               expect(res.gender).to.deep.equal(gender);
               expect(res.drinks).to.be.an('array');
               expect(res.drinks.length).to.equal(0);
+              // test if start time is within 15 seconds
               let startMS = new Date(res.start);
               startMS = startMS.getTime();
               let currMS = new Date;
@@ -212,19 +213,33 @@ describe('/api', function () {
   });
 
   describe('api/drinks/:id PUT', function() {
-    it('should reject a drink with missing id in url', function() {
+    it('should add a drink to the patron drinks array', function() {
       const newDrink = drink;
+      let patron;
+      let startDrinkCt;
       return Patron
         .findOne()
-        .then(function(patron) {
-          console.log(patron);
-          newDrink.id = patron._id;
+        .then(function(_patron) {
+          patron = _patron;
+          startDrinkCt = _patron.drinks.length;          
+          newDrink._id = patron._id;
+          // console.log(_patron);
+          // console.log(startDrinkCt);
+          // console.log(newDrink);
           return chai.request(app)
-            .put(`/api/drinks/${newDrink.id}`)
+            .put(`/api/drinks/${newDrink._id}`)
             .send(newDrink);
+        })
+        .then(function(res) {
+          expect(res).to.have.status(201);
+        })
+        .then(function() {
+          // get patrons and check if length of sel patron drinks increased
         });
     });
   });
+
+  // add test of PUT edge cases
 
   describe('api/patrons/dayclose DELETE', function() {
     it('Should delete all patrons', function() {
@@ -238,7 +253,26 @@ describe('/api', function () {
   });
 
   describe('api/patrons/:id DELETE', function() {
-    // drinks PUT tests
+    it('Should delete the patron indicated by id', function() {
+      let patron;
+      return Patron
+        .findOne()
+        .then(function(_patron) {
+          patron = _patron;
+          console.log(_patron);
+          return chai.request(app)
+            .delete(`/api/patrons/${patron._id}`);
+        })
+        .then(function(res) {
+          expect(res).to.have.status(204);
+        })
+        .then(function() {
+          // test to make sure the desired item is gone 
+        });
+    });
+
+    // test passing incorrect id to delete
+
   });
 
 });
