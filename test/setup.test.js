@@ -26,7 +26,7 @@ describe('/api', function () {
   const seat = 13;
   const gender = "m";
   const weight = 175;
-  const drink = {drinkEq: 1.0};
+  const drink = {drinks: {drinkEq: 1.0}};
 
   before(function() {
     return dbConnect(TEST_DATABASE_URL);
@@ -213,15 +213,28 @@ describe('/api', function () {
 
   describe('api/drinks/:id PUT', function() {
     it('should reject a drink with missing id in url', function() {
-      
-    })
-
-
-
+      const newDrink = drink;
+      return Patron
+        .findOne()
+        .then(function(patron) {
+          console.log(patron);
+          newDrink.id = patron._id;
+          return chai.request(app)
+            .put(`/api/drinks/${newDrink.id}`)
+            .send(newDrink);
+        });
+    });
   });
 
   describe('api/patrons/dayclose DELETE', function() {
-    // drinks PUT tests
+    it('Should delete all patrons', function() {
+      return chai
+        .request(app)
+        .delete('/api/patrons/dayclose/')
+        .then(function(res) {
+          expect(res).to.have.status(204);
+        });
+    });
   });
 
   describe('api/patrons/:id DELETE', function() {
