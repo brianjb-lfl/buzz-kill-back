@@ -4,6 +4,7 @@ const {TEST_DATABASE_URL} = require('../config');
 const {dbConnect, dbDisconnect} = require('../db-mongoose');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
+const chaiDateTime = require('chai-datetime');
 
 const { app } = require('../index');
 const {Patron} = require('../models');
@@ -18,15 +19,16 @@ process.stdout.write('\x1Bc\n');
 
 const expect = chai.expect;
 chai.use(chaiHttp);
+chai.use(chaiDateTime);
 
 describe('/api', function () {
   const table = 13;
   const seat = 13;
   const gender = "m";
+  const weight = 175;
   const drink = {drinkEq: 1.0};
 
   before(function() {
-    console.log(TEST_DATABASE_URL);
     return dbConnect(TEST_DATABASE_URL);
   });
 
@@ -51,8 +53,7 @@ describe('/api', function () {
 
   describe('api/patrons GET', function() {
     it('should return all existing patrons', function() {
-      return chai
-        .request(app)
+      return chai.request(app)
         .get('/api/patrons/')
         .then(function (res) {
           expect(res).to.have.status(200);
@@ -74,8 +75,7 @@ describe('/api', function () {
 
   describe('api/patrons POST', function() {
     it('should reject posts with missing table', function() {
-      return chai
-        .request(app)
+      return chai.request(app)
         .post('/api/patrons/')
         .send({seat, gender})
         .then(function () {
@@ -93,8 +93,7 @@ describe('/api', function () {
     });
 
     it('should reject posts with missing seat', function() {
-      return chai
-        .request(app)
+      return chai.request(app)
         .post('/api/patrons/')
         .send({table, gender})
         .then(function () {
@@ -112,8 +111,7 @@ describe('/api', function () {
     });
 
     it('should reject posts with missing gender', function() {
-      return chai
-        .request(app)
+      return chai.request(app)
         .post('/api/patrons/')
         .send({table, seat})
         .then(function () {
@@ -131,8 +129,7 @@ describe('/api', function () {
     });
 
     it('should reject posts with non-number table entry', function() {
-      return chai
-        .request(app)
+      return chai.request(app)
         .post('/api/patrons/')
         .send({table: "a", seat, gender})
         .then(function () {
@@ -149,8 +146,7 @@ describe('/api', function () {
     });
 
     it('should reject posts with non-number seat entry', function() {
-      return chai
-        .request(app)
+      return chai.request(app)
         .post('/api/patrons/')
         .send({table, seat: '', gender})
         .then(function () {
@@ -188,10 +184,40 @@ describe('/api', function () {
         });
     });
 
+    it('should create a new patron', function() {
+      return chai.request(app)
+        .post('/api/patrons/')
+        .send({table, seat, gender, weight})
+        .then(function(res) {
+          expect(res).to.have.status(201);
+          expect(res).to.be.an('object');
+          expect(res.body).to.include.keys('seatString', 'start', 'drinks', 'bac', 'timeOnSite');
+          return Patron.findOne({_id: res.body.id})
+            .then(function (res) {
+              expect(res.table).to.deep.equal(table);
+              expect(res.seat).to.deep.equal(seat);
+              expect(res.gender).to.deep.equal(gender);
+              expect(res.drinks).to.be.an('array');
+              expect(res.drinks.length).to.equal(0);
+              let startMS = new Date(res.start);
+              startMS = startMS.getTime();
+              let currMS = new Date;
+              currMS = currMS.getTime();
+              expect(currMS - startMS).to.be.below(15000);
+              expect(startMS - currMS).to.be.below(0);
+              expect(res.weight).to.deep.equal(weight);
+            });
+        });
+    });
   });
 
   describe('api/drinks/:id PUT', function() {
-    // drinks PUT tests
+    it('should reject a drink with missing id in url', function() {
+      
+    })
+
+
+
   });
 
   describe('api/patrons/dayclose DELETE', function() {
