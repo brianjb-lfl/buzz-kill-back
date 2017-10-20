@@ -6,6 +6,20 @@ const { Patron } = require('./models');
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
+router.get('/patrons/bytableseat/', (req, res) => {
+  Patron
+    .find()
+    .sort([['table', 'ascending'], ['seat', 'ascending']])
+    .then( patrons => {
+      let newArr = patrons.map( patron => patron.apiRepr());
+      res.json(newArr);
+    })
+    .catch( err => {
+      console.error(err);
+      res.status(500).json({error: 'Search failed'});
+    });
+});
+
 router.get('/patrons/', (req, res) => {
   Patron
     .find()
