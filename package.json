@@ -1,7 +1,7 @@
 {
-  "name": "thinkful-backend-template",
+  "name": "buzz-kill-backend",
   "version": "1.0.0",
-  "description": "Template for an Express backend",
+  "description": "API server providing individual patron consumption data to buzz-kill clients, helping alcohol-serving establishments provide a safe and enjoyable guest experience.",
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js",
@@ -10,7 +10,7 @@
     "heroku": "node index.js",
     "travis": "mocha test/setup.test.js */*.test.js"
   },
-  "author": "Joe Turner <jturner@thinkful.com>",
+  "author": "Brian Besaw and Jack Seabolt - based on template by Joe Turner <jturner@thinkful.com>",
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.18.2",
@@ -18,18 +18,15 @@
     "cors": "^2.8.4",
     "dotenv": "^4.0.0",
     "express": "^4.15.4",
-    "knex": "^0.13.0",
     "moment": "^2.19.1",
     "mongoose": "^4.11.12",
-    "morgan": "^1.8.2",
-    "pg": "^7.3.0"
+    "morgan": "^1.8.2"
   },
   "devDependencies": {
     "chai": "^4.1.2",
     "chai-http": "^3.0.0",
     "mocha": "^3.5.3",
     "nodemon": "^1.12.1",
-    "nyc": "^11.2.1",
-    "redux-devtools-extension": "^2.13.2"
+    "nyc": "^11.2.1"
   }
 }
