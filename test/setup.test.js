@@ -22,11 +22,13 @@ chai.use(chaiHttp);
 chai.use(chaiDateTime);
 
 describe('/api', function () {
+  // test data
   const table = 13;
   const seat = 13;
   const gender = "m";
   const weight = 175;
-  const drink = {drinks: {drinkEq: 1.0}};
+  const d = new Date();
+  const drink = {drinks: {drinkEq: 1.0, drinkTime: d.toISOString()}};
 
   before(function() {
     return dbConnect(TEST_DATABASE_URL);
@@ -56,10 +58,12 @@ describe('/api', function () {
       return chai.request(app)
         .get('/api/patrons/')
         .then(function (res) {
+          // check response
           expect(res).to.have.status(200);
           expect(res.body.length).to.be.above(0);
           expect(res.body).to.be.an('array');
           expect(res).to.be.json;
+          // check each patron element in response array
           res.body.forEach(function(patron) {
             expect(patron).to.be.an('object');
             expect(patron).to.include.keys('seatString', 'start', 'bac', 'timeOnSite', 'drinks');
@@ -131,7 +135,7 @@ describe('/api', function () {
     it('should reject posts with non-number table entry', function() {
       return chai.request(app)
         .post('/api/patrons/')
-        .send({table: "a", seat, gender})
+        .send({table: "a", seat, gender})     // text in table field
         .then(function () {
           expect.fail(null, null, 'Request should fail');})
         .catch(err => {
@@ -148,7 +152,7 @@ describe('/api', function () {
     it('should reject posts with non-number seat entry', function() {
       return chai.request(app)
         .post('/api/patrons/')
-        .send({table, seat: '', gender})
+        .send({table, seat: '', gender})      // empty string in seat field
         .then(function () {
           expect.fail(null, null, 'Request should fail');})
         .catch(err => {
@@ -163,7 +167,6 @@ describe('/api', function () {
     });
 
     it('should reject patrons in a seat already occupied', function() {
-      // create a patron with known table, seat
       return Patron.create({table, seat, gender})
         .then( () =>
           chai.request(app)
@@ -189,9 +192,11 @@ describe('/api', function () {
         .post('/api/patrons/')
         .send({table, seat, gender, weight})
         .then(function(res) {
+          // test response
           expect(res).to.have.status(201);
           expect(res).to.be.an('object');
           expect(res.body).to.include.keys('seatString', 'start', 'drinks', 'bac', 'timeOnSite');
+          // test the newly created individual patron 
           return Patron.findOne({_id: res.body.id})
             .then(function (res) {
               expect(res.table).to.deep.equal(table);
@@ -199,13 +204,13 @@ describe('/api', function () {
               expect(res.gender).to.deep.equal(gender);
               expect(res.drinks).to.be.an('array');
               expect(res.drinks.length).to.equal(0);
-              // test if start time is within 15 seconds
+              // test if start timestamp is recent (< 15 sec old)
               let startMS = new Date(res.start);
               startMS = startMS.getTime();
               let currMS = new Date;
               currMS = currMS.getTime();
-              expect(currMS - startMS).to.be.below(15000);
-              expect(startMS - currMS).to.be.below(0);
+              expect(currMS - startMS).to.be.below(15000);    // < 15 seconds difference
+              expect(startMS - currMS).to.be.below(0);        // start time earlier than current time
               expect(res.weight).to.deep.equal(weight);
             });
         });
@@ -217,15 +222,13 @@ describe('/api', function () {
       const newDrink = drink;
       let patron;
       let startDrinkCt;
+      let addedDrink = false;
       return Patron
         .findOne()
         .then(function(_patron) {
           patron = _patron;
           startDrinkCt = _patron.drinks.length;          
           newDrink._id = patron._id;
-          // console.log(_patron);
-          // console.log(startDrinkCt);
-          // console.log(newDrink);
           return chai.request(app)
             .put(`/api/drinks/${newDrink._id}`)
             .send(newDrink);
@@ -234,12 +237,45 @@ describe('/api', function () {
           expect(res).to.have.status(201);
         })
         .then(function() {
-          // get patrons and check if length of sel patron drinks increased
+          return chai.request(app)
+            .get('/api/patrons/')
+            .then(function(res) {
+              const targetPatron = res.body.find( el => el.id == patron._id);
+              // use drinkTime field to identify newly added drink
+              if(targetPatron.drinks.find( drink => drink.drinkTime == newDrink.drinks.drinkTime)){
+                addedDrink = true;
+              }
+              expect(addedDrink).to.equal(true);
+            });
         });
     });
   });
 
-  // add test of PUT edge cases
+  it('should reject put if id missing from body', function() {
+    return chai.request(app)
+      .put('/api/drinks/anyID')
+      .send()
+      .then(function(res) {
+      })
+      .catch(function(err) {
+        expect(err).to.have.status(400);
+        expect(err.response.body.error).to.equal('Request path id and request body id values must match');
+      });
+  });
+
+  it('should reject put if body and url ids dont match', function() {
+    const newDrink = drink;
+    newDrink._id = "a";
+    return chai.request(app)
+      .put('/api/drinks/mismatchedID')
+      .send(newDrink)
+      .then(function(res) {
+      })
+      .catch(function(err) {
+        expect(err).to.have.status(400);
+        expect(err.response.body.error).to.equal('Request path id and request body id values must match');
+      });
+  });
 
   describe('api/patrons/dayclose DELETE', function() {
     it('Should delete all patrons', function() {
@@ -248,6 +284,14 @@ describe('/api', function () {
         .delete('/api/patrons/dayclose/')
         .then(function(res) {
           expect(res).to.have.status(204);
+        })
+        .then(function() {
+          // confirm no patrons remain in collection
+          return chai.request(app)
+            .get('/api/patrons/')
+            .then(function(res) {
+              expect(!Object.keys(res.body).length).to.equal(true);
+            });
         });
     });
   });
@@ -255,11 +299,11 @@ describe('/api', function () {
   describe('api/patrons/:id DELETE', function() {
     it('Should delete the patron indicated by id', function() {
       let patron;
+      let noDelete;
       return Patron
         .findOne()
         .then(function(_patron) {
           patron = _patron;
-          console.log(_patron);
           return chai.request(app)
             .delete(`/api/patrons/${patron._id}`);
         })
@@ -267,12 +311,22 @@ describe('/api', function () {
           expect(res).to.have.status(204);
         })
         .then(function() {
-          // test to make sure the desired item is gone 
+          // confirm target item has been removed from collection
+          return chai.request(app)
+            .get('/api/patrons/')
+            .then(function(res) {
+              if(!Object.keys(res.body).length){
+                // no patrons remain in collection
+                noDelete = false;
+              }
+              else {
+                // target patron no longer in collection?
+                noDelete = res.body.find( el => el.id == patron._id );
+              }
+              expect(noDelete).to.equal(false);
+            });
         });
     });
-
-    // test passing incorrect id to delete
-
   });
 
 });
