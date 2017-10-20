@@ -1,4 +1,4 @@
-<img src="/logo.jpg" height="120">
+<img src="/img/logo.jpg" height="120">
 
 Why Buzz-Kill
 -------------
@@ -12,7 +12,15 @@ How it Works
       <p>Buzz-Kill's main screen displays colored boxes representing each patron in the establishment.</p>
     </td>
     <td>
-      <img src="/logo.jpg" height="120">
+      <img src="/img/buzz-kill-main.png" max-height="240" width="auto">
     </td>
+  </tr>
+    <td>
+      <p>When a new patron arrives, the server includes simple, additional information required for the ongoing bac calculation.</p>
+    </td>
+    <td>
+      <img src="/img/buzz-kill-addpatron.png" max-height="240" witdh="auto">
+    </td>
+  <tr>
   </tr>
 </table>
