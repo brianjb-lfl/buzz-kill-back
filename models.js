@@ -42,17 +42,24 @@ const PatronSchema = mongoose.Schema({
 
 PatronSchema.virtual('bac')
   .get(function() {
+    const genderMaleF = 0.73;
+    const genderFemaleF = 0.66;
+    const secPerHr = 3600000;
+    const alcOzPerDrinkEq = 0.6;
+    const wgtConvF = 5.14;                // convert lbs to oz and liquid oz to weight oz
+    const alcElimRate = .015;
     let bacCalc = 0;
-    const genderF = this.gender === 'm' ? .73 : .66;
+    const genderF = this.gender === 'm' ? genderMaleF : genderFemaleF;
     this.drinks.forEach( drink => {
-      const elapsedT = moment.utc(moment()).diff(moment.utc(drink.drinkTime))/3600000;
-      bacCalc += Math.max(((drink.drinkEq * .6 * 5.14) / (this.weight * genderF)) - (.015 * elapsedT), 0);
+      const elapsedHrs = moment.utc(moment()).diff(moment.utc(drink.drinkTime))/secPerHr;
+      bacCalc += Math.max(((drink.drinkEq * alcOzPerDrinkEq * wgtConvF) / (this.weight * genderF)) - (alcElimRate * elapsedHrs), 0);
     });
-    return (bacCalc * 100).toFixed(1);
+    return (bacCalc * 100).toFixed(1);    // eliminate leading ".0" to make numbers easier to read
   });
 
 PatronSchema.virtual('timeOnSite')
   .get(function() {
+    // builds string showing time elapsed since visit start
     let elapsedTime = Math.round(moment.utc(moment()).diff(moment.utc(this.start))/60000);
     let timeOutput = Math.floor(elapsedTime / 60);
     elapsedTime -= (timeOutput * 60);

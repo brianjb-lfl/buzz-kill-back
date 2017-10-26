@@ -1,4 +1,5 @@
 'use strict';
+/* eslint no-console: "off" */
 
 const express = require('express');
 const router = express.Router();
@@ -35,7 +36,6 @@ router.get('/patrons/', (req, res) => {
 });
 
 router.post('/patrons/', jsonParser, (req, res) => {
-  
   const requiredFs = ['table', 'seat', 'gender'];
   const missingF = requiredFs.find( field => !(field in req.body));
   if (missingF) {
@@ -92,7 +92,7 @@ router.put('/drinks/:id', jsonParser, (req, res) => {
   Patron
     .findByIdAndUpdate(
       req.params.id,
-      {"$push": { "drinks": req.body.drinks }}, {"new":true}
+      {"$push": {"drinks": req.body.drinks }}, {"new":true}
     )
     .then(
       patron => res.status(201).json(patron.apiRepr())
@@ -103,7 +103,6 @@ router.put('/drinks/:id', jsonParser, (req, res) => {
 });
 
 router.delete('/patrons/dayclose/', (req, res) => {
-  
   return Patron
     .remove({})
     .then( () => {
@@ -112,7 +111,6 @@ router.delete('/patrons/dayclose/', (req, res) => {
 });
 
 router.delete('/patrons/:id', (req, res) => {
-
   Patron
     .find(req.params.id)
     .then( patron => {

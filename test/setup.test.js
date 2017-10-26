@@ -58,12 +58,10 @@ describe('/api', function () {
       return chai.request(app)
         .get('/api/patrons/')
         .then(function (res) {
-          // check response
           expect(res).to.have.status(200);
           expect(res.body.length).to.be.above(0);
           expect(res.body).to.be.an('array');
           expect(res).to.be.json;
-          // check each patron element in response array
           res.body.forEach(function(patron) {
             expect(patron).to.be.an('object');
             expect(patron).to.include.keys('seatString', 'start', 'bac', 'timeOnSite', 'drinks');
@@ -192,11 +190,9 @@ describe('/api', function () {
         .post('/api/patrons/')
         .send({table, seat, gender, weight})
         .then(function(res) {
-          // test response
           expect(res).to.have.status(201);
           expect(res).to.be.an('object');
           expect(res.body).to.include.keys('seatString', 'start', 'drinks', 'bac', 'timeOnSite');
-          // test the newly created individual patron 
           return Patron.findOne({_id: res.body.id})
             .then(function (res) {
               expect(res.table).to.deep.equal(table);
@@ -209,8 +205,8 @@ describe('/api', function () {
               startMS = startMS.getTime();
               let currMS = new Date;
               currMS = currMS.getTime();
-              expect(currMS - startMS).to.be.below(15000);    // < 15 seconds difference
-              expect(startMS - currMS).to.be.below(0);        // start time earlier than current time
+              expect(currMS - startMS).to.be.below(15000);    // start is < 15 seconds before current time
+              expect(startMS - currMS).to.be.below(0);        // pvs would pass if start was after current, so test start before current
               expect(res.weight).to.deep.equal(weight);
             });
         });
@@ -320,7 +316,7 @@ describe('/api', function () {
                 noDelete = false;
               }
               else {
-                // target patron no longer in collection?
+                // target patron no longer in collection
                 noDelete = res.body.find( el => el.id == patron._id );
               }
               expect(noDelete).to.equal(false);
@@ -328,5 +324,4 @@ describe('/api', function () {
         });
     });
   });
-
 });

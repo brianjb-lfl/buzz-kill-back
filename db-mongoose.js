@@ -1,4 +1,5 @@
 'use strict';
+/* eslint no-console: "off" */
 
 require('dotenv').load();
 const mongoose = require('mongoose');

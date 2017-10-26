@@ -1,4 +1,5 @@
 'use strict';
+/* eslint no-console: "off" */
 
 const express = require('express');
 const cors = require('cors');
