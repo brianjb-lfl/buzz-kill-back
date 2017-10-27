@@ -96,7 +96,7 @@ Data Fields
 |  weight             |  number, for bac calculation, patron's estimated weight                      |
 |  gender             |  string, for bac calculation, patron's apparent gender                       |
 |  start              |  timestamp - when patron arrived at establishment                            |
-|  **drinks**         |  array of objects, each representing a drink consumed by the patron          |
+|  drinks         |  array of objects, each representing a drink consumed by the patron          |
 |  drinks: drinkEq    |  number, relative strength/alcohol content of drink<br>e.g. 1 = 12oz beer, glass of wine, or shot of liquor
 |  drinks: drinkTime  |  timestamp, time at which drink was ordered, used in bac calculation         |
 |                     |                                                                              |
