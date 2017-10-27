@@ -179,6 +179,7 @@ On failure, return code: 500
 
 Technology Used
 ------
+* javascript
 * node.js
 * express
 * cors
