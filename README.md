@@ -54,6 +54,37 @@ Where to find Buzz-Kill
 |deployed api              |   https://buzz-kill-backend-bbp.herokuapp.com/                          |
 |api code                  |   https://github.com/brianjb-lfl/buzz-kill-back                         | 
 
+Local API Use
+------
+1.  clone this repository<br>
+``` git clone https://github.com/brianjb-lfl/buzz-kill-back.git```<br>
+
+2.  move to the repository's local directory<br>
+``` cd buzz-kill-back```<br>
+
+3.  install dependencies<br>
+``` npm install```<br>
+
+note: use of this api requires access to a mongo database<br>
+
+4.  if using a remote database instance (e.g. mLab)<br>
+    create a .env file in the repository root with the following line:<br>
+``` DATABASE_URL=(database connection string/url)```<br>
+
+4.  or, you can use a local mongo database<br>
+    when using a local database, omit the DATABASE_URL .env setting<br>
+    in the config.js file, modify the second part of the following line accordingly<br>
+``` process.env.DATABASE_URL || 'mongodb://localhost/thinkful-backend'```<br>
+
+5.  start the server<br>
+``` npm start```<br>
+
+The api can now be accessed at:  
+```http://localhost:8080/```
+
+See below for specific endpoints.
+
+
 Data Fields
 ------
 
