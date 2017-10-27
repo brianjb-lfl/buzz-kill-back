@@ -12,7 +12,7 @@ How it Works
 <table layout="fixed">
   <tr>
     <td width="55%">
-      <p>Buzz-Kill's main screen displays colored boxes representing each patron in the establishment.</p>
+      <p>Buzz-Kill's main screen displays a colored box for each patron in the establishment.  The color-coding and easy-to-read number on the box represent an estimate of that patron's bac based on the count and timing of their drinks during the current visit.</p>
     </td>
     <td width = "40%">
       <img src="/img/buzz-kill-main.png" max-height="240px" width="auto">
@@ -20,7 +20,7 @@ How it Works
   </tr>
   <tr>
     <td>
-      <p>When a new patron arrives, the server includes simple, additional information required for the ongoing bac calculation.          </p>
+      <p>When a new patron arrives, the server logs them in by table and seat.  To facilitate the bac calculation, the patron's gender is also logged.  As an option for more accuracy, the system can be modified to accept an estimate of the patron's weight.</p>
     </td>
     <td>
       <img src="/img/buzz-kill-addpatron.png" max-height="240px" witdh="auto">
@@ -28,7 +28,7 @@ How it Works
   </tr>
   <tr>
     <td>
-      <p>The large numbers and color coding make the patron tile easy to understand.  Additionl information available includes seat location, time of stay, and a graphic representation of drink purchases.</p>
+      <p>Key information is provided for each patron in a user-friendly format.  The color of the patron info box changes gradually from green to red as the patron has more to drink, and then back toward green over time as the patron metabolizes the alcohol they've consumed.  The number indicates the patron's calculated bac expressed in 100th's of a percent.  This format is used to make the number easier to recognize at a glance.  For more detail, the patron's current time of stay in the establishment and a graphical representation of their drink orders is provided.</p>
     </td>
     <td>
       <img src="/img/buzz-kill-patrondet.png" max-height="240px" witdh="auto">
@@ -36,7 +36,7 @@ How it Works
   </tr>
   <tr>
     <td>
-      <p>And if someone goes too far, help is a click away.</p>
+      <p>And if someone goes too far, help is a just a click away.  The system will allow a phone call, text message or email to be sent to the recipient of the establishment's choosing.</p>
     </td>
     <td>
       <img src="/img/buzz-kill-patronemergency.png" max-height="240px" witdh="auto">
@@ -44,12 +44,20 @@ How it Works
   </tr>
 </table>
 
-|deployed client           |   https://buzz-kill-bbp.herokuapp.com/             .                    |
+Where to find Buzz-Kill
+------
+
+|          **desc**        |                   **location**                                          |
+|--------------------------|-------------------------------------------------------------------------|
+|live client               |   https://buzz-kill-bbp.herokuapp.com/             .                    |
 |client code               |   https://github.com/brianjb-lfl/buzz-kill-frontend                     |
 |deployed api              |   https://buzz-kill-backend-bbp.herokuapp.com/                          |
 |api code                  |   https://github.com/brianjb-lfl/buzz-kill-back                         | 
 
-|  **Field**          |         **Description**                                                      |
+Data Fields
+------
+
+|  **field**          |         **description**                                                      |
 |:--------------------|:-----------------------------------------------------------------------------|
 |  id                 |  uniquely assigned id                                                        |
 |  table              |  number, table number at which patron is seated                              |
