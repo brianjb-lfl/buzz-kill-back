@@ -49,15 +49,15 @@ Where to find Buzz-Kill
 
 |          **desc**        |                   **location**                                          |
 |--------------------------|-------------------------------------------------------------------------|
-|live client               |   https://buzz-kill-bbp.herokuapp.com/             .                    |
-|client code               |   https://github.com/brianjb-lfl/buzz-kill-frontend                     |
-|deployed api              |   https://buzz-kill-backend-bbp.herokuapp.com/                          |
+|live client               |   https://buzz-kill.herokuapp.com                  .                    |
+|client code               |   https://github.com/jackseabolt/buzz-kill-frontend                     |
+|deployed api              |   https://buzz-kill-back.herokuapp.com                                  |
 |api code                  |   https://github.com/brianjb-lfl/buzz-kill-back                         | 
 
 Local API Use
 ------
 1.  clone this repository<br>
-``` git clone https://github.com/brianjb-lfl/buzz-kill-back.git```<br>
+``` git clone https://github.com/brianjb-lfl/buzz-kill-back```<br>
 
 2.  move to the repository's local directory<br>
 ``` cd buzz-kill-back```<br>
